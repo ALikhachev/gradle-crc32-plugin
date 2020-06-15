@@ -1,0 +1,40 @@
+package com.alikhachev.jetbrains.crc32
+
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.*
+import org.gradle.work.Incremental
+import org.gradle.work.InputChanges
+import java.io.File
+
+@CacheableTask
+open class Crc32Task : DefaultTask() {
+    @get:Incremental
+    @get:InputFiles
+    @get:SkipWhenEmpty
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    lateinit var inputJars: FileCollection
+
+    @get:OutputFiles
+    lateinit var outputJars: Map<String, File>
+
+    @TaskAction
+    fun computeCrc32Sum(inputChanges: InputChanges) {
+        if (inputChanges.isIncremental) {
+            println("Incremental mode")
+        } else {
+            println("Non-incremental mode")
+        }
+
+        inputChanges.getFileChanges(inputJars).forEach { change ->
+            val sumCounter = Crc32SumCounter()
+            val inputJar = change.file
+            val outputJar = outputJars[inputJar.absolutePath]
+            copyZip(inputJar, outputJar!!, sumCounter).use {
+                val comment = "CRC32 sum: ${sumCounter.crc32sum.toString(16)}"
+                it.setComment(comment)
+                println("${inputJar.name} $comment")
+            }
+        }
+    }
+}
