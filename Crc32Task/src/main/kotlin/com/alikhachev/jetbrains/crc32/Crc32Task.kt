@@ -11,6 +11,7 @@ import java.io.File
 open class Crc32Task : DefaultTask() {
     @get:Incremental
     @get:InputFiles
+    @get:Classpath
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
     lateinit var inputJars: FileCollection
@@ -30,10 +31,14 @@ open class Crc32Task : DefaultTask() {
             val sumCounter = Crc32SumCounter()
             val inputJar = change.file
             val outputJar = outputJars[inputJar.absolutePath]
-            copyZip(inputJar, outputJar!!, sumCounter).use {
+            if (outputJar == null) {
+                println("Output jar for $inputJar is not configured!")
+                return;
+            }
+            copyZip(inputJar, outputJar, sumCounter).use { outputStream ->
                 val comment = "CRC32 sum: ${sumCounter.crc32sum.toString(16)}"
-                it.setComment(comment)
                 println("${inputJar.name} $comment")
+                outputStream.setComment(comment)
             }
         }
     }

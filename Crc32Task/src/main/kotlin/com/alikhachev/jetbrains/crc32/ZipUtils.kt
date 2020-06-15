@@ -1,28 +1,22 @@
 package com.alikhachev.jetbrains.crc32
 
+import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream
+import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.File
 import java.io.FileOutputStream
-import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
 
 /**
  * Don't forget to close returned output stream!
- * @return
  */
-fun copyZip(input: File, output: File, visitor: ZipVisitor): ZipOutputStream {
+fun copyZip(input: File, output: File, visitor: ZipEntryVisitor): JarArchiveOutputStream {
     ZipFile(input).use { zipFile ->
-        val zipEntries = zipFile.entries()
-        val zos = ZipOutputStream(FileOutputStream(output))
-        for (entry in zipEntries) {
-            zos.putNextEntry(entry)
+        val outputStream = JarArchiveOutputStream(FileOutputStream(output))
+        for (entry in zipFile.entries) {
             if (!entry.isDirectory) {
-                visitor.visitFile(zipFile, entry)
-                zipFile.getInputStream(entry).use {
-                    it.copyTo(zos)
-                }
+                visitor.visitEntry(entry)
             }
-            zos.closeEntry()
+            outputStream.addRawArchiveEntry(entry, zipFile.getRawInputStream(entry))
         }
-        return zos
+        return outputStream
     }
 }

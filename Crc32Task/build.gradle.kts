@@ -15,6 +15,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(gradleApi())
+    implementation("org.apache.commons:commons-compress:1.20")
 }
 
 tasks {
