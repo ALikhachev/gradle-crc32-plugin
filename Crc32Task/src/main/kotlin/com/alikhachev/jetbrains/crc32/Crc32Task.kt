@@ -28,18 +28,22 @@ open class Crc32Task : DefaultTask() {
         }
 
         inputChanges.getFileChanges(inputJars).forEach { change ->
-            val sumCounter = Crc32SumCounter()
             val inputJar = change.file
             val outputJar = outputJars[inputJar.absolutePath]
             if (outputJar == null) {
                 println("Output jar for $inputJar is not configured!")
                 return;
             }
-            copyZip(inputJar, outputJar, sumCounter).use { outputStream ->
-                val comment = "CRC32 sum: ${sumCounter.crc32sum.toString(16)}"
-                println("${inputJar.name} $comment")
-                outputStream.setComment(comment)
-            }
+            fillCrc32Comment(inputJar, outputJar)
         }
+    }
+}
+
+fun fillCrc32Comment(inputJar: File, outputJar: File) {
+    val sumCounter = Crc32SumCounter()
+    copyZip(inputJar, outputJar, sumCounter).use { outputStream ->
+        val comment = "CRC32 sum: ${sumCounter.crc32sum.toString(16)}"
+        println("${inputJar.name} $comment")
+        outputStream.setComment(comment)
     }
 }

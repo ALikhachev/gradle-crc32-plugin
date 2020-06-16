@@ -16,6 +16,10 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(gradleApi())
     implementation("org.apache.commons:commons-compress:1.20")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
+    testImplementation("org.hamcrest:hamcrest-library:2.1")
+    testImplementation("commons-io:commons-io:2.7")
+    testImplementation(gradleTestKit())
 }
 
 tasks {
@@ -24,6 +28,9 @@ tasks {
     }
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
+    }
+    test {
+        useJUnitPlatform()
     }
 }
 

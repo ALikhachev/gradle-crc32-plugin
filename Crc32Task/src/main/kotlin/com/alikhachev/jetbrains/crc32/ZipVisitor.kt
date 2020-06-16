@@ -12,7 +12,7 @@ class Crc32SumCounter : ZipEntryVisitor {
     override fun visitEntry(entry: ZipEntry) {
         if (!entry.name.endsWith(".class")) return
         crc32sum += entry.crc
-        val className = entry.name.replace("/", ".").substring(0, entry.name.length - 6)
-        println("$className CRC32: ${entry.crc.toString(16)}")
+//        val className = entry.name.replace("/", ".").substring(0, entry.name.length - 6)
+//        println("$className CRC32: ${entry.crc.toString(16)}")
     }
 }
