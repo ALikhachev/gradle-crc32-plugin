@@ -12,8 +12,6 @@ open class Crc32Task : DefaultTask() {
     @get:Incremental
     @get:InputFiles
     @get:Classpath
-    @get:SkipWhenEmpty
-    @get:PathSensitive(PathSensitivity.RELATIVE)
     lateinit var inputJars: FileCollection
 
     @get:OutputFiles
